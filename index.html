@@ -123,7 +123,7 @@ function showOverlay(id, season=null, episode=null){
   frameArea.style.cssText = "width:100%;height:100%;display:flex;justify-content:center;align-items:center;";
   playerContainer.appendChild(frameArea);
 
-     const providers = [
+   const providers = [
     {
       name:"VidPlus",
       url: currentType==="movie" 
@@ -164,7 +164,22 @@ function showOverlay(id, season=null, episode=null){
         : `https://xprime.tv/watch/${id}/${season}/${episode}`,
       sandbox:true
     },
+    {
+      name:"SpenEmbed",
+      url: currentType==="movie"
+        ? `https://spencerdevs.xyz/movie/${id}`
+        : `https://spencerdevs.xyz/tv/${id}/${season}/${episode}`,
+      sandbox:true
+    },
+    {
+      name:"Flixer",
+      url: currentType==="movie"
+        ? `https://flixer.su/watch/movie/${id}`
+        : `https://flixer.su/watch/tv/${id}/${season}/${episode}`,
+      sandbox:true
+    }
   ];
+
 
   providers.forEach(p=>{
     const btn = document.createElement("button");
