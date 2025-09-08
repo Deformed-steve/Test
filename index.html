@@ -164,13 +164,6 @@ function showOverlay(id, season=null, episode=null){
         : `https://xprime.tv/watch/${id}/${season}/${episode}`,
       sandbox:true
     },
-    {
-      name:"All Embed",
-      url: currentType==="movie"
-        ? `https://player.embed-api.stream/?id=${id}&type=movie`
-        : `https://player.embed-api.stream/?id=${id}&s=${season}&e=${episode}`,
-      sandbox:true
-    }
   ];
 
   providers.forEach(p=>{
