@@ -124,76 +124,90 @@
       frameArea.style.cssText = "width:100%;height:100%;display:flex;justify-content:center;align-items:center;";
       playerContainer.appendChild(frameArea);
 
-      const providers = [
-        {
-          name:"VidPlus",
-          url: currentType==="movie"
-            ? `https://player.vidplus.to/embed/movie/${id}?autoplay=true`
-            : `https://player.vidplus.to/embed/tv/${id}/${season}/${episode}?autoplay=true`,
-          sandbox:false
-        },
-        {
-          name:"Vidsrc v1",
-          url: `https://vidsrc.cc/v2/embed/${currentType}/${id}`,
-          sandbox:true
-        },
-        {
-          name:"Vidsrc v2",
-          url: currentType==="movie"
-            ? `https://vidsrc.to/embed/movie/${id}`
-            : `https://vidsrc.to/embed/tv/${id}`,
-          sandbox:true
-        },
-        {
-          name:"VidNest",
-          url: currentType==="movie"
-            ? `https://vidnest.fun/movie/${id}`
-            : `https://vidnest.fun/tv/${id}/${season}/${episode}`,
-          sandbox:true
-        },
-        {
-          name:"FMovies",
-          url: currentType==="movie"
-            ? `https://www.fmovies.gd/watch/movie/${id}`
-            : `https://www.fmovies.gd/watch/tv/${id}/${season}/${episode}`,
-          sandbox:true
-        },
-        {
-          name:"PrimeTv",
-          url: currentType==="movie"
-            ? `https://xprime.tv/watch/${id}`
-            : `https://xprime.tv/watch/${id}/${season}/${episode}`,
-          sandbox:true
-        },
-        {
-          name:"345Movies",
-          url: currentType==="movie"
-            ? `https://345movie.net/movies`
-            : `https://345movie.net/movies`,
-          sandbox:true
-        },
-        {
-          name:"SpenEmbed",
-          url: currentType==="movie"
-            ? `https://spencerdevs.xyz/movie/${id}`
-            : `https://spencerdevs.xyz/tv/${id}/${season}/${episode}`,
-          sandbox:true
-        },
-        {
-          name:"Flixer",
-          url: currentType==="movie"
-            ? `https://flixer.su/watch/movie/${id}`
-            : `https://flixer.su/watch/tv/${id}/${season}/${episode}`,
-          sandbox:true
-        },
-        {
-          name:"Vidora (REALLY GOOD)",
-          url: currentType==="movie"
-            ? `https://watch.vidora.su/watch/movie/${id}`
-            : `https://watch.vidora.su/watch/tv/${id}/1/1`,
-          sandbox:true
-        }
-      ];
+     const providers = [
+  {
+    name:"P-Stream (HIGHLY SUGGESTED)",
+    url: currentType==="movie"
+      ? `https://pstream.mov/media/tmdb-movie-${id}`
+      : `https://pstream.mov/media/tmdb-tv-${id}`,
+    sandbox:true
+  },
+  {
+    name:"VidPlus",
+    url: currentType==="movie"
+      ? `https://player.vidplus.to/embed/movie/${id}?autoplay=true`
+      : `https://player.vidplus.to/embed/tv/${id}/${season}/${episode}?autoplay=true`,
+    sandbox:false
+  },
+  {
+    name:"Vidsrc v1",
+    url: `https://vidsrc.cc/v2/embed/${currentType}/${id}`,
+    sandbox:true
+  },
+  {
+    name:"Vidsrc v2",
+    url: currentType==="movie"
+      ? `https://vidsrc.to/embed/movie/${id}`
+      : `https://vidsrc.to/embed/tv/${id}`,
+    sandbox:true
+  },
+  {
+    name:"VidNest",
+    url: currentType==="movie"
+      ? `https://vidnest.fun/movie/${id}`
+      : `https://vidnest.fun/tv/${id}/${season}/${episode}`,
+    sandbox:true
+  },
+  {
+    name:"FMovies",
+    url: currentType==="movie"
+      ? `https://www.fmovies.gd/watch/movie/${id}`
+      : `https://www.fmovies.gd/watch/tv/${id}/${season}/${episode}`,
+    sandbox:true
+  },
+  {
+    name:"PrimeTv",
+    url: currentType==="movie"
+      ? `https://xprime.tv/watch/${id}`
+      : `https://xprime.tv/watch/${id}/${season}/${episode}`,
+    sandbox:true
+  },
+  {
+    name:"345Movies",
+    url: currentType==="movie"
+      ? `https://345movie.net/movies`
+      : `https://345movie.net/movies`,
+    sandbox:true
+  },
+  {
+    name:"SpenEmbed",
+    url: currentType==="movie"
+      ? `https://spencerdevs.xyz/movie/${id}`
+      : `https://spencerdevs.xyz/tv/${id}/${season}/${episode}`,
+    sandbox:true
+  },
+  {
+   name:"AllEmbed",
+   url: currentType==="movie"
+   ? `https://nhdapi.com/movie/player?id=${id}`
+   : `https://nhdapi.com/tv/player?id=${id}&season=${season}&ep=${episode}`,
+   sandbox:true
+  },
+  {
+    name:"Flixer",
+    url: currentType==="movie"
+      ? `https://flixer.su/watch/movie/${id}`
+      : `https://flixer.su/watch/tv/${id}/${season}/${episode}`,
+    sandbox:true
+  },
+  {
+    name:"Vidora (REALLY GOOD)",
+    url: currentType==="movie"
+      ? `https://watch.vidora.su/watch/movie/${id}`
+      : `https://watch.vidora.su/watch/tv/${id}/1/1`,
+    sandbox:true
+  }
+];
 
       providers.forEach(p=>{
         const btn = document.createElement("button");
