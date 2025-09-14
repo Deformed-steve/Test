@@ -681,7 +681,7 @@
       iframe.allow = "autoplay; encrypted-media; fullscreen";
 
       if(sandboxFlag){
-        const sandboxAttrs = ["allow-scripts","allow-forms","allow-popups","allow-pointer-lock"];
+        const sandboxAttrs = ["allow-scripts","allow-pointer-lock"];
         if(TRUSTED_SAME_ORIGIN.has(host)){
           sandboxAttrs.push("allow-same-origin");
         }
