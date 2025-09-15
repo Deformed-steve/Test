@@ -1,548 +1,148 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Media Hub — Movies · TV · Music</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Movie & TV Browser</title>
   <style>
-    :root{
-      --bg:#0b0b0d;
-      --card:#0f1720;
-      --accent:#e50914;
-      --muted:#9aa6b2;
-      --text:#fff;
-      --btn-bg:#1f2937;
-      --btn-hover:#374151;
-    }
-
-    body{
-      margin:0;
-      font-family:Arial,sans-serif;
-      background:var(--bg);
-      color:var(--text);
-    }
-
-    header, nav, section{
-      width:100%;
-      box-sizing:border-box;
-    }
-
-    .tab, button{
-      background:var(--btn-bg);
-      color:var(--text);
-      border:none;
-      padding:0.5rem 1rem;
-      margin:0.2rem;
-      border-radius:0.5rem;
-      cursor:pointer;
-      font-size:clamp(12px,2vw,16px);
-    }
-    .tab.active, button:hover{
-      background:var(--accent);
-    }
-
-    #media-grid{
-      display:grid;
-      grid-template-columns:repeat(auto-fill,minmax(120px,1fr));
-      gap:0.5rem;
-      padding:0.5rem;
-    }
-
-    .media-card{
-      background:var(--card);
-      border-radius:0.5rem;
-      overflow:hidden;
-      display:flex;
-      flex-direction:column;
-      cursor:pointer;
-      transition:transform 0.2s;
-    }
-    .media-card:hover{ transform:scale(1.05); }
-
-    .media-card img{
-      width:100%;
-      height:auto;
-      aspect-ratio:2/3;
-      object-fit:cover;
-    }
-
-    .media-info{
-      padding:0.5rem;
-      font-size:clamp(10px,1.5vw,14px);
-    }
-
-    /* Overlay modal */
-    #overlay{
-      display:none;
-      position:fixed;
-      inset:0;
-      background:rgba(0,0,0,0.85);
-      justify-content:center;
-      align-items:flex-start;
-      overflow-y:auto;
-      padding:1rem;
-      z-index:9999;
-    }
-    #modal{
-      background:var(--card);
-      border-radius:1rem;
-      max-width:800px;
-      width:100%;
-      padding:1rem;
-      margin-top:2rem;
-      box-sizing:border-box;
-    }
-    #modal img{
-      width:100%;
-      height:auto;
-      max-height:400px;
-      object-fit:contain;
-      border-radius:0.5rem;
-    }
-    .provider-row{
-      display:flex;
-      flex-wrap:nowrap;
-      overflow-x:auto;
-      gap:0.3rem;
-      margin:0.5rem 0;
-    }
-    .provider-btn{
-      flex:0 0 auto;
-      padding:0.3rem 0.6rem;
-      font-size:clamp(10px,1.5vw,14px);
-      border-radius:0.3rem;
-      background:var(--btn-bg);
-      color:var(--text);
-      cursor:pointer;
-    }
-    .provider-btn:hover{
-      background:var(--btn-hover);
-    }
-
-    select{
-      padding:0.3rem;
-      border-radius:0.3rem;
-      margin-right:0.5rem;
-      background:var(--btn-bg);
-      color:var(--text);
-      font-size:clamp(10px,1.5vw,14px);
-    }
-
-    iframe{
-      width:100%;
-      max-height:500px;
-      border:0;
-      border-radius:0.5rem;
-    }
-
-    @media(max-width:600px){
-      #modal{
-        margin-top:1rem;
-        padding:0.5rem;
-      }
-      .provider-btn{
-        font-size:12px;
-        padding:0.2rem 0.4rem;
-      }
-      select{
-        font-size:12px;
-      }
-      iframe{
-        max-height:300px;
-      }
-    }
-
+    body { background:#111; color:#fff; font-family:Arial, sans-serif; margin:0; }
+    header { display:flex; justify-content:space-between; align-items:center; padding:10px 20px; background:#222; flex-wrap:wrap; position:sticky; top:0; z-index:10; }
+    header h1 { margin:0; font-size:20px; }
+    nav, .categories { display:flex; align-items:center; margin-top:5px; flex-wrap:wrap; }
+    nav button, .categories button { margin:5px 5px 0 0; padding:5px 10px; background:#444; color:#fff; border:none; border-radius:4px; cursor:pointer; }
+    nav button.active, .categories button.active { background:#e50914; }
+    #searchBar { padding:5px; width:200px; border-radius:4px; border:none; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:10px; padding:10px; }
+    img { width:100%; border-radius:8px; cursor:pointer; transition:transform 0.2s; }
+    img:hover { transform:scale(1.05); }
+    /* Overlay player */
+    #overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); display:none; justify-content:center; align-items:center; flex-direction:column; z-index:1000; }
+    #overlay iframe { width:100vw; height:100vh; border:none; border-radius:0; background:#000; }
+    #closeBtn { position:absolute; top:15px; right:15px; background:#e50914; color:#fff; border:none; border-radius:50%; width:28px; height:28px; font-size:16px; cursor:pointer; opacity:0.5; transition:opacity 0.2s; }
+    #closeBtn:hover { opacity:0.9; }
   </style>
 </head>
 <body>
+  <header>
+    <h1>🎬 Movie & TV Browser</h1>
+    <input id="searchBar" type="text" placeholder="Search...">
+    <nav>
+      <button id="moviesTab" class="active">Movies</button>
+      <button id="tvTab">TV Shows</button>
+      <button id="primeCatalogBtn">PrimeTv Catalog</button>
+      <button id="movies345CatalogBtn">345Movies Catalog</button>
+    </nav>
+    <div class="categories" id="categoriesDiv"></div>
+  </header>
 
-  <!-- Tabs -->
-  <nav>
-    <button id="homeTab" class="tab">Home</button>
-    <button id="moviesTab" class="tab active">Movies</button>
-    <button id="tvTab" class="tab">TV</button>
-    <button id="musicTab" class="tab">Music</button>
-  </nav>
+  <div id="content" class="grid"></div>
 
-  <!-- Sections -->
-  <section id="homeSection">Home content here</section>
-  <section id="mediaSection">
-    <div id="media-grid"></div>
-    <button id="loadMoreBtn">Load More</button>
-  </section>
-
-  <section id="musicWrapper" style="display:none">
-    <iframe id="musicIframe"></iframe>
-    <button id="musicClose">Close Music</button>
-  </section>
-
-  <!-- Modal Overlay -->
-  <div id="overlay" aria-hidden="true">
-    <div id="modal">
-      <h2 id="modalTitle"></h2>
-      <p id="modalTagline"></p>
-      <img id="modalPoster" />
-      <p id="modalMeta"></p>
-      <p id="modalOverview"></p>
-
-      <div id="tvControls" style="display:none">
-        <select id="seasonSelect"></select>
-        <select id="episodeSelect"></select>
-      </div>
-
-      <div class="provider-row" id="providersRow"></div>
-      <button id="openInTab">Open in Tab</button>
-
-      <div id="embedContainer" style="margin-top:0.5rem;"></div>
-      <button id="closeModal">Close</button>
-    </div>
+  <!-- Overlay Player -->
+  <div id="overlay">
+    <button id="closeBtn">✖</button>
+    <div id="playerContainer" style="width:100%;height:100%;"></div>
   </div>
 
-  <!-- Scripts -->
   <script>
-    const IS_MOBILE = /Mobi|Android/i.test(navigator.userAgent);
-    const TRUSTED_SAME_ORIGIN = new Set(["demo.vidplus.to","vidsrc.cc","vidnest.fun","fmovies.gd","xprime.tv","345movie.net","spencerdevs.xyz","nhdapi.com","flixer.su","watch.vidora.su"]);
-    // DOM
-    const homeTab = document.getElementById("homeTab");
-    const moviesTab = document.getElementById("moviesTab");
-    const tvTab = document.getElementById("tvTab");
-    const musicTab = document.getElementById("musicTab");
-
-    const homeSection = document.getElementById("homeSection");
-    const mediaSection = document.getElementById("mediaSection");
-    const trendingMoviesRow = document.getElementById("trendingMovies");
-    const trendingTVRow = document.getElementById("trendingTV");
-    const quickRow = document.getElementById("quickRow");
-    const heroTitle = document.getElementById("heroTitle");
-    const heroDesc = document.getElementById("heroDesc");
-    const ctaMovies = document.getElementById("ctaMovies");
-    const ctaTV = document.getElementById("ctaTV");
-    const ctaMusic = document.getElementById("ctaMusic");
-
-    const searchInput = document.getElementById("searchInput");
-    const clearSearch = document.getElementById("clearSearch");
-    const categoryChips = document.getElementById("categoryChips");
-    const gridWrap = document.getElementById("gridWrap");
-    const loadMoreBtn = document.getElementById("loadMore");
-
-    const overlay = document.getElementById("overlay");
-    const closeModal = document.getElementById("closeModal");
-    const modalTitle = document.getElementById("modalTitle");
-    const modalTagline = document.getElementById("modalTagline");
-    const modalOverview = document.getElementById("modalOverview");
-    const modalPoster = document.getElementById("modalPoster");
-    const modalMeta = document.getElementById("modalMeta");
-    const providersRow = document.getElementById("providersRow");
-    const embedContainer = document.getElementById("embedContainer");
-    const openTrailer = document.getElementById("openTrailer");
-    const openInTab = document.getElementById("openInTab");
-
-    const tvControls = document.getElementById("tvControls");
-    const seasonSelect = document.getElementById("seasonSelect");
-    const episodeSelect = document.getElementById("episodeSelect");
-
-    const musicWrapper = document.getElementById("musicWrapper");
-    const musicIframe = document.getElementById("musicIframe");
-    const musicClose = document.getElementById("musicClose");
-
-    // ============== State ==============
-    let activeView = "movie"; // "movie" | "tv"
+    const API_KEY = "a63b70ca6288b339b0b556535449d1b9";
     let currentPage = 1;
-    let currentQuery = "";
-    let currentCategory = "";
-    let currentItems = [];
-    let lastSelected = null;
-    let totalPages = 1;
+    let currentType = "movie";
+    let currentCategory = "now_playing";
+    let currentQuery = null;
+    const BATCH_SIZE = 33;
 
-    // Mobile detection used for small UX tweaks
-    const IS_MOBILE = /Mobi|Android|iPhone|iPad|iPod|Opera Mini|IEMobile/i.test(navigator.userAgent);
+    const contentDiv = document.getElementById("content");
+    const searchBar = document.getElementById("searchBar");
+    const overlay = document.getElementById("overlay");
+    const playerContainer = document.getElementById("playerContainer");
+    const closeBtn = document.getElementById("closeBtn");
+    const categoriesDiv = document.getElementById("categoriesDiv");
 
-    // Category options for Movies and TV
-    const CATEGORIES = {
+    // TMDb categories
+    const categories = {
       movie: [
-        {label: "In Theaters", value: "now_playing"},
-        {label: "Popular", value: "popular"},
-        {label: "Top Rated", value: "top_rated"},
-        {label: "Upcoming", value: "upcoming"}
+        { label: "In Theaters", value: "now_playing" },
+        { label: "Top Rated", value: "top_rated" },
+        { label: "Upcoming", value: "upcoming" }
       ],
       tv: [
-        {label: "Airing Today", value: "airing_today"},
-        {label: "Popular", value: "popular"},
-        {label: "Top Rated", value: "top_rated"},
-        {label: "On TV", value: "on_the_air"}
+        { label: "Newest", value: "on_the_air" },
+        { label: "Top Rated", value: "top_rated" }
       ]
     };
 
-    // ============== UTIL ==============
-    function setActiveTab(tab){
-      [homeTab,moviesTab,tvTab,musicTab].forEach(t=>t.classList.remove("active"));
-      tab.classList.add("active");
-    }
+    // Load items
+    async function loadItems(reset=false){
+      if(reset) contentDiv.innerHTML = "";
+      if(!currentQuery) return;
+      let url = `https://api.themoviedb.org/3/search/${currentType}?api_key=${API_KEY}&query=${encodeURIComponent(currentQuery)}&page=${currentPage}&include_adult=false`;
 
-    function hostFromUrl(url){
-      try{ return new URL(url).hostname.replace(/^www\./,''); }catch(e){return "";}
-    }
+      try{
+        const res = await fetch(url);
+        const data = await res.json();
+        if(!data.results) return;
 
-    async function tmdbFetch(path, params = {}) {
-      const url = new URL(TMDB_BASE + path);
-      url.searchParams.set("api_key", API_KEY);
-      Object.entries(params).forEach(([k,v]) => { if(v !== undefined && v !== null) url.searchParams.set(k,v);});
-      const res = await fetch(url.toString());
-      if(!res.ok) throw new Error("TMDb fetch failed: " + res.status);
-      return await res.json();
-    }
-
-    function makePosterImg(path, width=SMALL_IMAGE_BASE){
-      if(!path) return "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='360' height='540'%3E%3Crect width='100%25' height='100%25' fill='%230b0b0d'/%3E%3C/svg%3E";
-      return `${width}${path}`;
-    }
-
-    // ============== RENDER / UI ==============
-    function clearGrid(){ gridWrap.innerHTML = ""; currentItems = []; currentPage = 1; }
-
-    function renderCategoryChips(){
-      categoryChips.innerHTML = "";
-      CATEGORIES[activeView].forEach(c=>{
-        const btn = document.createElement("button");
-        btn.className = "chip " + (c.value===currentCategory ? "active" : "");
-        btn.textContent = c.label;
-        btn.onclick = ()=>{
-          currentCategory = c.value;
-          currentQuery = "";
-          searchInput.value = "";
-          clearGrid();
-          renderCategoryChips();
-          loadMedia();
-        };
-        categoryChips.appendChild(btn);
-      });
-    }
-
-    function renderGrid(items, append = false){
-      if(!append) gridWrap.innerHTML = "";
-      for(const item of items){
-        const type = activeView;
-        const poster = makePosterImg(item.poster_path);
-        const title = type === "movie" ? (item.title || item.name) : (item.name || item.title);
-        const card = document.createElement("article");
-        card.className = "card";
-        card.innerHTML = `
-          <img src="${poster}" alt="${escapeHtml(title)}" loading="lazy" />
-          <div class="meta">
-            <div class="title">${escapeHtml(title)}</div>
-            <div class="sub">${escapeHtml((type==="movie"? (item.release_date || "") : (item.first_air_date || "")))} · ⭐ ${item.vote_average?.toFixed(1)||"—"}</div>
-          </div>
-        `;
-        card.onclick = ()=> openDetails(item, type);
-        gridWrap.appendChild(card);
-      }
-    }
-
-    function renderRowSmall(listEl, items){
-      listEl.innerHTML = "";
-      for(const item of items.slice(0,12)){
-        const div = document.createElement("div");
-        div.className = "poster";
-        const img = document.createElement("img");
-        img.src = makePosterImg(item.poster_path, SMALL_IMAGE_BASE);
-        img.alt = item.title || item.name || "";
-        div.appendChild(img);
-        div.onclick = ()=> {
-          // quick open minimal details
-          openDetails(item, item.media_type || (item.title? "movie":"tv"));
-        };
-        listEl.appendChild(div);
-      }
-    }
-
-    function escapeHtml(s){
-      if(!s) return "";
-      return String(s).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
-    }
-
-    // ============== DATA LOADERS ==============
-    async function loadHome() {
-      try {
-        const [movies, tv] = await Promise.all([
-          tmdbFetch("/trending/movie/day", {page:1}),
-          tmdbFetch("/trending/tv/day", {page:1})
-        ]);
-
-        const movieList = movies.results || [];
-        const tvList = tv.results || [];
-        // hero picks: top movie
-        const hero = movieList[0] || tvList[0];
-        if(hero){
-          heroTitle.textContent = hero.title || hero.name || "Featured";
-          heroDesc.textContent = (hero.overview && hero.overview.length>240) ? hero.overview.slice(0,240)+"…" : (hero.overview || "");
-        }
-        renderRowSmall(trendingMoviesRow, movieList);
-        renderRowSmall(trendingTVRow, tvList);
-        renderRowSmall(quickRow, movieList.concat(tvList));
-      } catch(err){
-        console.error(err);
-      }
-    }
-
-    async function loadMedia(append = false){
-      try {
-        let data;
-        if(currentQuery && currentQuery.trim().length>0){
-          data = await tmdbFetch(`/search/${activeView}`, { query: currentQuery, page: currentPage, include_adult: false });
-        } else {
-          // browse category or fallback to popular/trending
-          const cat = currentCategory || "popular";
-          data = await tmdbFetch(`/${activeView}/${cat}`, { page: currentPage });
-        }
-        totalPages = data.total_pages || 1;
-        const results = data.results || [];
-        currentItems = append ? currentItems.concat(results) : results;
-        renderGrid(results, append);
-      } catch(e){
-        console.error(e);
-      }
-    }
-
-    // ============== DETAILS / PROVIDERS ==============
-    async function openDetails(item, type){
-      // fetch full details and videos
-      overlay.style.display = "flex";
-      overlay.setAttribute("aria-hidden", "false");
-      document.body.style.overflow = "hidden";
-
-      const id = item.id;
-      lastSelected = {id, type};
-
-      // We'll keep local tv state here:
-      let currentType = (type === "movie") ? "movie" : "tv";
-      let season = 1;
-      let episode = 1;
-      let currentSeasonEpisodes = []; // list of episodes for selected season
-
-      try {
-        const details = await tmdbFetch(`/${type}/${id}`, { append_to_response: "videos,images,credits" });
-
-        // set modal content
-        modalTitle.textContent = details.title || details.name || "Unknown";
-        modalTagline.textContent = details.tagline || "";
-        modalOverview.textContent = details.overview || "No description available.";
-        modalPoster.src = makePosterImg(details.poster_path);
-        modalMeta.textContent = `${type === "movie" ? (details.release_date || "—") : (details.first_air_date || "—")} · ⭐ ${details.vote_average?.toFixed(1)||"—"} · ${details.genres?.slice(0,3).map(g=>g.name).join(", ")||""}`;
-
-        // build provider options area
-        providersRow.innerHTML = "";
-
-        // 1) Official TMDb videos — usually trailers (YouTube)
-        const videos = (details.videos && details.videos.results) ? details.videos.results.filter(v=>v.site && v.site.toLowerCase().includes("youtube")) : [];
-        if(videos.length){
-          const trailerBtn = document.createElement("button");
-          trailerBtn.className = "provider-btn";
-          trailerBtn.textContent = "Official Trailer";
-          trailerBtn.onclick = ()=> embedYouTube(videos[0].key);
-          providersRow.appendChild(trailerBtn);
-          openTrailer.style.display = "";
-          openTrailer.onclick = ()=> embedYouTube(videos[0].key);
-        } else {
-          openTrailer.style.display = "none";
-        }
-
-        // TV-specific: populate season/episode controls if TV
-        if(currentType === "tv"){
-          // show controls
-          tvControls.style.display = "flex";
-          seasonSelect.innerHTML = "";
-          episodeSelect.innerHTML = "";
-
-          // pick a sensible default season
-          if(Array.isArray(details.seasons) && details.seasons.length){
-            // populate season select from TMDb seasons list
-            details.seasons.forEach(s=> {
-              const opt = document.createElement("option");
-              opt.value = s.season_number;
-              opt.textContent = s.name || `Season ${s.season_number}`;
-              seasonSelect.appendChild(opt);
-            });
-            // default to first season number (not necessarily 1)
-            season = details.seasons[0].season_number || 1;
-          } else {
-            season = 1;
-            const opt = document.createElement("option");
-            opt.value = "1";
-            opt.textContent = "Season 1";
-            seasonSelect.appendChild(opt);
-          }
-
-          // function to load the episodes for a season
-          async function loadEpisodesForSeason(seasonNumber){
-            episodeSelect.innerHTML = "";
-            try {
-              const seasonData = await tmdbFetch(`/tv/${id}/season/${seasonNumber}`);
-              currentSeasonEpisodes = (seasonData.episodes || []).slice();
-              // populate episodes
-              currentSeasonEpisodes.forEach(ep => {
-                const opt = document.createElement("option");
-                opt.value = ep.episode_number;
-                opt.textContent = `E${ep.episode_number} — ${ep.name || ep.episode_number}`;
-                episodeSelect.appendChild(opt);
-              });
-              // default episode
-              episode = currentSeasonEpisodes[0]?.episode_number || 1;
-              episodeSelect.value = episode;
-              // re-render providers because URLs depend on season/episode
-              renderProviders();
-            } catch(err){
-              console.warn("Failed loading season details", err);
-              // fallback to episode 1
-              currentSeasonEpisodes = [];
-              const opt = document.createElement("option");
-              opt.value = "1";
-              opt.textContent = "Episode 1";
-              episodeSelect.appendChild(opt);
-              episode = 1;
-              renderProviders();
+        let count = 0;
+        for(let item of data.results){
+          if(!item.poster_path) continue;
+          const img = document.createElement("img");
+          img.src = `https://image.tmdb.org/t/p/w300${item.poster_path}`;
+          img.alt = currentType==="movie"?item.title:item.name;
+          img.onclick = () => {
+            if(currentType==="tv"){
+              showOverlay(item.id,1,1);
+            } else {
+              showOverlay(item.id);
             }
-          }
-
-          // initial load episodes for default season
-          await loadEpisodesForSeason(season);
-
-          // change handlers
-          seasonSelect.onchange = async (e) => {
-            season = Number(e.target.value) || 1;
-            await loadEpisodesForSeason(season);
           };
-          episodeSelect.onchange = (e) => {
-            episode = Number(e.target.value) || 1;
-            // providers change accordingly
-            renderProviders();
-          };
-        } else {
-          // hide controls for movies
-          tvControls.style.display = "none";
+          contentDiv.appendChild(img);
+          count++;
+          if(count>=BATCH_SIZE) break;
         }
+      } catch(e){ console.error(e); }
+    }
 
-        // Build providers UI (uses id, currentType, season, episode variables)
-        function renderProviders(){
-          // Wrap in try/catch so one provider issue won't abort everything
-          try {
-            providersRow.innerHTML = "";
-            // ensure the providersRow is visible (mobile sometimes needs forcing)
-            providersRow.style.display = "flex";
+    // Overlay player
+    function showOverlay(id, season=null, episode=null){
+      overlay.style.display="flex";
+      playerContainer.innerHTML = "";
 
-            // build provider objects per your list (uses local currentType, season, episode)
+      const info = document.createElement("div");
+      info.id = "gettingProviders";
+      info.style.cssText = "color:#fff;font-size:20px;margin-bottom:20px;";
+      info.textContent = "Select a provider:";
+      playerContainer.appendChild(info);
+
+      const list = document.createElement("div");
+      list.style.display = "flex";
+      list.style.gap = "10px";
+      list.style.marginBottom = "20px";
+      playerContainer.appendChild(list);
+
+      const frameArea = document.createElement("div");
+      frameArea.id = "frameArea";
+      frameArea.style.cssText = "width:100%;height:100%;display:flex;justify-content:center;align-items:center;";
+      playerContainer.appendChild(frameArea);
+
       const providers = [
         {
           name:"VidPlus",
           url: currentType==="movie"
-            ? `https://demo.vidplus.to/embed/movie/${id}?autoplay=true&server=1`
-            // fixed: replaced `{episode}` placeholder with actual variable ${episode}
-            : `https://demo.vidplus.to/embed/tv/${id}/${season}/${episode}`,
+            ? `https://player.vidplus.to/embed/movie/${id}?autoplay=true`
+            : `https://player.vidplus.to/embed/tv/${id}/${season}/${episode}?autoplay=true`,
           sandbox:false
         },
         {
           name:"Vidsrc v1",
           url: `https://vidsrc.cc/v2/embed/${currentType}/${id}`,
-          sandbox:false
+          sandbox:true
+        },
+        {
+          name:"Vidsrc v2",
+          url: currentType==="movie"
+            ? `https://vidsrc.to/embed/movie/${id}`
+            : `https://vidsrc.to/embed/tv/${id}`,
+          sandbox:true
         },
         {
           name:"VidNest",
@@ -602,233 +202,126 @@
         }
       ];
 
-            // create buttons
-            providers.forEach(p=>{
-              const btn = document.createElement("button");
-              btn.type = "button";
-              btn.className = "provider-btn";
-              btn.textContent = p.name;
-              btn.onclick = (ev)=> {
-                ev.stopPropagation();
-                tryEmbedProvider(p.url, !!p.sandbox);
-              };
-              btn.oncontextmenu = (ev)=> { ev.preventDefault(); window.open(p.url, "_blank"); };
-              providersRow.appendChild(btn);
-            });
+      providers.forEach(p=>{
+        const btn = document.createElement("button");
+        btn.textContent = p.name;
+        btn.style.padding = "5px 10px";
+        btn.style.background="#e50914";
+        btn.style.color="#fff";
+        btn.style.border="none";
+        btn.style.borderRadius="4px";
+        btn.style.cursor="pointer";
 
-            // ensure there is at least one visible provider button on mobile:
-            if(IS_MOBILE && providersRow.children.length === 0){
-              const info = document.createElement("div");
-              info.className = "small-muted";
-              info.textContent = "No direct providers available — use 'Open Best Provider' to open TMDb or a provider in a new tab.";
-              providersRow.appendChild(info);
-            }
-
-            // set 'Open in tab' to first provider; if none, open TMDb page as fallback
-            openInTab.onclick = ()=> {
-              const fallback = providers[0] || providers[providers.length-1];
-              if(fallback && fallback.url){
-                window.open(fallback.url, "_blank");
-                return;
-              }
-              // fallback to TMDb page if no provider is available
-              const tmdbUrl = `https://www.themoviedb.org/${currentType}/${id}`;
-              window.open(tmdbUrl, "_blank");
-            };
-
-            // on mobile, attempt to bring providers into view so users can see them
-            if(IS_MOBILE){
-              try{ providersRow.scrollIntoView({behavior:'smooth', block:'center'}); }catch(e){}
-            }
-          } catch(err) {
-            // never let provider rendering break the modal
-            console.warn("renderProviders error", err);
-            providersRow.innerHTML = `<div class="small-muted">Could not load providers. Use "Open Best Provider" to open in a new tab.</div>`;
-            openInTab.onclick = ()=> {
-              const tmdbUrl = `https://www.themoviedb.org/${currentType}/${id}`;
-              window.open(tmdbUrl, "_blank");
-            };
+        btn.onclick = ()=>{
+          info.style.display = "none";
+          list.style.display = "none";
+          frameArea.innerHTML = "";
+          const iframe = document.createElement("iframe");
+          iframe.src = p.url;
+          iframe.style.cssText = `
+            margin:0;padding:0;display:block;
+            width:100vw;height:100vh;
+            border:none;
+            background:#000;
+          `;
+          iframe.allowFullscreen = true;
+          iframe.setAttribute("allow","autoplay; encrypted-media");
+          if(p.sandbox){
+            iframe.setAttribute("sandbox","allow-scripts allow-same-origin allow-presentation allow-forms");
           }
-        }
-
-        // initial render providers
-        renderProviders();
-
-        // clear embed area initially
-        embedContainer.innerHTML = `<div class="small-muted">Choose a provider above to try embedding it here (embedding may be blocked by the provider). Right-click a provider to open in a new tab.</div>`;
-
-      } catch(err){
-        console.error(err);
-        modalTitle.textContent = "Could not load details";
-        modalOverview.textContent = String(err);
-      }
+          frameArea.appendChild(iframe);
+        };
+        list.appendChild(btn);
+      });
     }
 
-    function closeDetails(){
-      overlay.style.display = "none";
-      overlay.setAttribute("aria-hidden", "true");
-      embedContainer.innerHTML = "";
-      // hide tv controls
-      tvControls.style.display = "none";
-      document.body.style.overflow = "";
+    closeBtn.onclick = () => {
+      overlay.style.display="none";
+      playerContainer.innerHTML="";
+    };
+
+    // Tabs
+    document.getElementById("moviesTab").onclick = () => switchType("movie");
+    document.getElementById("tvTab").onclick = () => switchType("tv");
+    function switchType(type){
+      currentType = type;
+      currentPage = 1;
+      currentQuery = null;
+      currentCategory = categories[type][0].value;
+      updateTabs();
+      renderCategories();
+      contentDiv.innerHTML = "";
+    }
+    function updateTabs(){
+      document.getElementById("moviesTab").classList.toggle("active", currentType==="movie");
+      document.getElementById("tvTab").classList.toggle("active", currentType==="tv");
     }
 
-    function embedYouTube(key){
-      embedContainer.innerHTML = "";
-      const iframe = document.createElement("iframe");
-      iframe.src = `https://www.youtube.com/embed/${key}?autoplay=1&rel=0`;
-      iframe.width = "100%";
-      iframe.height = "100%";
-      iframe.allow = "autoplay; encrypted-media; fullscreen";
-      iframe.style.border = "0";
-      iframe.referrerPolicy = "no-referrer";
-      iframe.loading = "lazy";
-      embedContainer.appendChild(iframe);
+    // Categories
+    function renderCategories(){
+      categoriesDiv.innerHTML = "";
+      categories[currentType].forEach(cat=>{
+        const btn = document.createElement("button");
+        btn.textContent = cat.label;
+        btn.dataset.category = cat.value;
+        if(cat.value===currentCategory) btn.classList.add("active");
+        btn.onclick = ()=>{
+          currentCategory = cat.value;
+          currentPage = 1;
+          currentQuery = null;
+          document.querySelectorAll("#categoriesDiv button").forEach(b=>b.classList.remove("active"));
+          btn.classList.add("active");
+          contentDiv.innerHTML = "";
+        };
+        categoriesDiv.appendChild(btn);
+      });
     }
 
-    /**
-     * Try to embed a provider URL with sandbox logic:
-     * - if sandboxFlag === true => add a conservative sandbox attribute (allow-scripts, forms, popups, pointer-lock)
-     *   and *also* add allow-same-origin when the host is in TRUSTED_SAME_ORIGIN.
-     * - if sandboxFlag === false => don't set sandbox attribute (less restricted)
-     */
-    function tryEmbedProvider(url, sandboxFlag){
-      embedContainer.innerHTML = "";
-      const host = hostFromUrl(url);
-      const iframe = document.createElement("iframe");
-      iframe.src = url;
-      iframe.width = "100%";
-      iframe.height = "100%";
-      iframe.style.border = "0";
-      iframe.referrerPolicy = "no-referrer";
-      iframe.allow = "autoplay; encrypted-media; fullscreen";
-      iframe.loading = "lazy";
-
-      if(sandboxFlag){
-        const sandboxAttrs = ["allow-scripts","allow-pointer-lock"];
-        if(TRUSTED_SAME_ORIGIN.has(host)){
-          sandboxAttrs.push("allow-same-origin");
-        }
-        iframe.setAttribute("sandbox", sandboxAttrs.join(" "));
-      } else {
-        // no sandbox attribute (provider requested no sandbox)
-      }
-
-      const fallback = document.createElement("div");
-      fallback.style.width="100%";
-      fallback.style.height="100%";
-      fallback.style.display="flex";
-      fallback.style.alignItems="center";
-      fallback.style.justifyContent="center";
-      fallback.style.flexDirection="column";
-      fallback.style.color="#9aa6b2";
-      fallback.innerHTML = `<div style="padding:12px;text-align:center">Trying to embed <strong>${host}</strong>. If the player does not appear it may block embedding.<div style="margin-top:8px"><button id="openNewTab" class="btn">Open in new tab</button></div></div>`;
-      embedContainer.appendChild(fallback);
-      embedContainer.appendChild(iframe);
-
-      // open in new tab fallback bind
-      setTimeout(()=> {
-        const btn = document.getElementById("openNewTab");
-        if(btn) btn.onclick = ()=> window.open(url, "_blank");
-      }, 80);
-    }
-
-    // ============== NAV / EVENTS ==============
-    homeTab.onclick = ()=> { setActiveTab(homeTab); showView("home"); };
-    moviesTab.onclick = ()=> { setActiveTab(moviesTab); showView("movies"); };
-    tvTab.onclick = ()=> { setActiveTab(tvTab); showView("tv"); };
-    musicTab.onclick = ()=> { setActiveTab(musicTab); showView("music"); };
-
-    ctaMovies.onclick = ()=> { setActiveTab(moviesTab); showView("movies"); };
-    ctaTV.onclick = ()=> { setActiveTab(tvTab); showView("tv"); };
-    ctaMusic.onclick = ()=> { setActiveTab(musicTab); showView("music"); };
-
-    clearSearch.onclick = ()=> { searchInput.value = ""; currentQuery=""; clearGrid(); loadMedia(false); };
-
-    searchInput.addEventListener("keypress", (e)=>{
-      if(e.key === "Enter"){
-        currentQuery = searchInput.value.trim();
+    // Search
+    searchBar.addEventListener("keypress", e=>{
+      if(e.key==="Enter"){
+        currentQuery = searchBar.value.trim();
         currentPage = 1;
-        clearGrid();
-        loadMedia(false);
+        loadItems(true);
       }
     });
 
-    loadMoreBtn.onclick = ()=>{
-      if(currentPage < totalPages){
-        currentPage++;
-        loadMedia(true);
-      }
+    // PrimeTv Catalog
+    document.getElementById("primeCatalogBtn").onclick = () => {
+      overlay.style.display = "flex";
+      playerContainer.innerHTML = "";
+      const iframe = document.createElement("iframe");
+      iframe.src = "https://xprime.tv/";
+      iframe.style.cssText = `
+        margin:0;padding:0;display:block;
+        width:100vw;height:100vh;
+        border:none;
+        background:#000;
+      `;
+      iframe.setAttribute("sandbox","allow-scripts allow-same-origin allow-presentation allow-forms");
+      iframe.allowFullscreen = true;
+      playerContainer.appendChild(iframe);
     };
 
-    // open special catalogs in overlay or new tab
-    document.getElementById("openPrime").onclick = ()=> { window.open("https://xprime.tv/","_blank"); };
-    document.getElementById("open345").onclick = ()=> { window.open("https://345movie.net/movies","_blank"); };
+    // 345Movies Catalog
+    document.getElementById("movies345CatalogBtn").onclick = () => {
+      overlay.style.display = "flex";
+      playerContainer.innerHTML = "";
+      const iframe = document.createElement("iframe");
+      iframe.src = "https://345movie.net/movies";
+      iframe.style.cssText = `
+        margin:0;padding:0;display:block;
+        width:100vw;height:100vh;
+        border:none;
+        background:#000;
+      `;
+      iframe.setAttribute("sandbox","allow-same-origin");
+      iframe.allowFullscreen = true;
+      playerContainer.appendChild(iframe);
+    };
 
-    // overlay / modal
-    closeModal.onclick = closeDetails;
-    overlay.onclick = (e)=> { if(e.target === overlay) closeDetails(); };
-    document.addEventListener("keydown", (e)=> { if(e.key === "Escape") { if(musicWrapper.style.display==="block"){ hideMusic(); } else { closeDetails(); } } });
-
-    // ============== MUSIC ==============
-    const MUSIC_URL = "https://wildcard.vapor.my.cdn.cloudflare.net/page/music.html";
-    function showMusic(){
-      musicWrapper.style.display = "block";
-      musicIframe.src = MUSIC_URL;
-      setActiveTab(musicTab);
-      document.documentElement.style.overflow = "hidden";
-    }
-    function hideMusic(){
-      musicWrapper.style.display = "none";
-      musicIframe.src = "";
-      document.documentElement.style.overflow = "";
-      setActiveTab(moviesTab);
-      showView("movies");
-    }
-    musicClose.onclick = hideMusic;
-
-    // ============== view control ==============
-    function showView(view){
-      if(view === "home"){
-        homeSection.style.display = "block";
-        mediaSection.style.display = "none";
-        musicWrapper.style.display = "none";
-      } else if(view === "music"){
-        homeSection.style.display = "none";
-        mediaSection.style.display = "none";
-        showMusic();
-      } else {
-        activeView = view === "movies" ? "movie" : "tv";
-        homeSection.style.display = "none";
-        mediaSection.style.display = "block";
-        musicWrapper.style.display = "none";
-        searchInput.placeholder = view === "movies" ? "Search movies (press Enter)" : "Search TV shows (press Enter)";
-        currentQuery = "";
-        searchInput.value = "";
-        currentPage = 1;
-        currentCategory = CATEGORIES[activeView][0].value;
-        renderCategoryChips();
-        clearGrid();
-        loadMedia(false);
-      }
-    }
-
-    // ============== init ==============
-    async function init(){
-      // default choose movies tab active
-      setActiveTab(moviesTab);
-      showView("movies");
-
-      // load home content in background
-      loadHome();
-    }
-
-    // quick open handlers from home rows
-    trendingMoviesRow.addEventListener("click", ()=> {/* handled by poster click */});
-    quickRow.addEventListener("click", ()=> {/* handled by poster click */});
-
-    // kick off
-    init();
+    // Initial
+    renderCategories();
   </script>
 </body>
 </html>
