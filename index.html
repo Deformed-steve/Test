@@ -2,221 +2,206 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Media Hub — Movies · TV · Music</title>
   <style>
     :root{
-      --bg:#0b0b0d; --card:#0f1720; --accent:#e50914; --muted:#9aa6b2;
-      --glass: rgba(255,255,255,0.03);
-      --radius:14px;
-      --transition:200ms cubic-bezier(.2,.8,.2,1);
+      --bg:#0b0b0d;
+      --card:#0f1720;
+      --accent:#e50914;
+      --muted:#9aa6b2;
+      --text:#fff;
+      --btn-bg:#1f2937;
+      --btn-hover:#374151;
     }
-    *{box-sizing:border-box}
-    html,body{height:100%; margin:0; font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,Helvetica,Arial; background:linear-gradient(180deg,#050507 0%, #0b0b0d 60%); color:#e6eef6; -webkit-font-smoothing:antialiased;}
-    header{position:sticky; top:0; z-index:60; display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 20px; background:linear-gradient(180deg, rgba(9,11,14,0.55), rgba(9,11,14,0.15)); backdrop-filter: blur(6px); border-bottom:1px solid rgba(255,255,255,0.02);}
-    .brand {display:flex; align-items:center; gap:12px;}
-    .logo {width:42px; height:42px; border-radius:10px; background:linear-gradient(135deg,#e50914,#ff6d6d); display:flex; align-items:center; justify-content:center; font-weight:700; color:#fff; box-shadow:0 6px 18px rgba(0,0,0,0.5); }
-    h1 {font-size:16px; margin:0; letter-spacing:0.2px;}
-    .top-tabs {display:flex; gap:8px; align-items:center;}
-    .tab-btn {background:transparent; color:var(--muted); padding:8px 12px; border-radius:10px; border:none; cursor:pointer; font-weight:600; transition:var(--transition);}
-    .tab-btn.active {background:linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01)); color:var(--accent); box-shadow: 0 6px 20px rgba(229,9,20,0.07), inset 0 -2px 10px rgba(0,0,0,0.2);}
-    main {padding:22px; max-width:1300px; margin:0 auto;}
-    /* Home hero */
-    .hero {display:grid; grid-template-columns: 1fr 360px; gap:18px; align-items:stretch; margin-bottom:20px;}
-    .hero-card {background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:var(--radius); padding:24px; position:relative; overflow:hidden; display:flex; flex-direction:column; justify-content:center; gap:12px;}
-    .hero-title {font-size:22px; margin:0 0 6px 0;}
-    .hero-desc {color:var(--muted); margin:0 0 8px 0;}
-    .hero-actions {display:flex; gap:8px; margin-top:10px;}
-    .cta {padding:10px 14px; border-radius:10px; border:none; cursor:pointer; font-weight:700; transition:var(--transition);}
-    .cta.primary {background:var(--accent); color:#fff;}
-    .cta.ghost {background:rgba(255,255,255,0.02); color:#fff;}
-    .side-card {background:var(--glass); border-radius:var(--radius); padding:12px;}
-    .section {margin-top:20px;}
-    .section h2{margin:0 0 12px 0; font-size:18px;}
-    .row {display:flex; gap:10px; overflow:auto; padding-bottom:6px;}
-    .poster {min-width:120px; width:140px; border-radius:12px; overflow:hidden; background:#111; box-shadow:0 8px 30px rgba(0,0,0,0.6); cursor:pointer; transform-origin:center; transition:transform 220ms;}
-    .poster img{width:100%; height:210px; object-fit:cover; display:block;}
-    .poster:hover{transform:translateY(-6px) scale(1.03);}
-    /* media section */
-    .media-toolbar{display:flex; gap:12px; align-items:center; margin-bottom:12px; flex-wrap:wrap;}
-    .search {flex:1; display:flex; gap:8px; align-items:center; background:var(--card); padding:8px; border-radius:12px; min-width:260px;}
-    .search input {flex:1; border:0; background:transparent; color: #e6eef6; outline:none; padding:6px;}
-    .chip-row {display:flex; gap:8px; align-items:center; flex-wrap:wrap;}
-    .chip {padding:8px 10px; border-radius:999px; background:rgba(255,255,255,0.02); color:var(--muted); cursor:pointer; border:none; transition:var(--transition); font-weight:600;}
-    .chip.active{background:linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01)); color:var(--accent);}
-    .grid {display:grid; grid-template-columns: repeat(auto-fill,minmax(160px,1fr)); gap:14px; margin-top:10px;}
-    .card {background:linear-gradient(180deg, rgba(255,255,255,0.015), transparent); border-radius:12px; overflow:hidden; padding-bottom:8px; cursor:pointer;}
-    .card img{width:100%; height:230px; object-fit:cover; display:block;}
-    .meta {padding:10px; display:flex; flex-direction:column; gap:6px;}
-    .title {font-weight:700; font-size:14px;}
-    .sub {color:var(--muted); font-size:13px;}
-    .load-more {display:flex; justify-content:center; margin-top:18px;}
-    .btn {padding:10px 16px; border-radius:10px; border:none; background:rgba(255,255,255,0.03); color:#fff; cursor:pointer;}
-    /* overlay modal */
-    #overlay {position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:110; padding:20px;}
-    .modal {width:100%; max-width:1100px; height:90vh; background:linear-gradient(180deg, rgba(3,6,10,0.95), rgba(3,6,10,0.98)); border-radius:14px; overflow:hidden; display:flex; gap:16px; box-shadow:0 30px 80px rgba(2,6,23,0.8);}
-    .modal-left {width:420px; min-width:320px; background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent); padding:18px; display:flex; flex-direction:column; gap:12px;}
-    .modal-left img{width:100%; height:480px; object-fit:cover; border-radius:10px;}
-    .modal-right {flex:1; padding:18px; display:flex; flex-direction:column; gap:12px; overflow:auto;}
-    .close-x{position:absolute; top:18px; right:20px; background:rgba(0,0,0,0.45); border:none; color:#fff; width:36px; height:36px; border-radius:8px; cursor:pointer;}
-    .providers {display:flex; flex-wrap:wrap; gap:8px; margin-top:6px;}
-    .provider-btn{padding:8px 10px; border-radius:10px; border:none; cursor:pointer; background:rgba(255,255,255,0.03); color:#fff; font-weight:700;}
-    .provider-embed {flex:1; background:#000; border-radius:10px; overflow:hidden; display:flex; justify-content:center; align-items:center; min-height:360px;}
-    .small-muted{color:var(--muted); font-size:13px;}
-    /* music fullscreen */
-    #musicWrapper {display:none; position:fixed; inset:0; z-index:90; background:#000; }
-    #musicIframe{width:100%; height:100%; border:0;}
-    .music-close {position:fixed; top:18px; right:18px; z-index:200; background:var(--accent); color:#fff; border:none; width:46px; height:46px; border-radius:10px; font-weight:700; cursor:pointer;}
-    /* responsive */
-    @media (max-width:980px){
-      .hero{grid-template-columns:1fr; gap:12px;}
-      .hero-card{order:2}
-      .side-card{order:1}
-      .modal-left{width:100%; min-width:unset}
-      .modal{flex-direction:column; height:92vh;}
+
+    body{
+      margin:0;
+      font-family:Arial,sans-serif;
+      background:var(--bg);
+      color:var(--text);
     }
+
+    header, nav, section{
+      width:100%;
+      box-sizing:border-box;
+    }
+
+    .tab, button{
+      background:var(--btn-bg);
+      color:var(--text);
+      border:none;
+      padding:0.5rem 1rem;
+      margin:0.2rem;
+      border-radius:0.5rem;
+      cursor:pointer;
+      font-size:clamp(12px,2vw,16px);
+    }
+    .tab.active, button:hover{
+      background:var(--accent);
+    }
+
+    #media-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(120px,1fr));
+      gap:0.5rem;
+      padding:0.5rem;
+    }
+
+    .media-card{
+      background:var(--card);
+      border-radius:0.5rem;
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+      cursor:pointer;
+      transition:transform 0.2s;
+    }
+    .media-card:hover{ transform:scale(1.05); }
+
+    .media-card img{
+      width:100%;
+      height:auto;
+      aspect-ratio:2/3;
+      object-fit:cover;
+    }
+
+    .media-info{
+      padding:0.5rem;
+      font-size:clamp(10px,1.5vw,14px);
+    }
+
+    /* Overlay modal */
+    #overlay{
+      display:none;
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,0.85);
+      justify-content:center;
+      align-items:flex-start;
+      overflow-y:auto;
+      padding:1rem;
+      z-index:9999;
+    }
+    #modal{
+      background:var(--card);
+      border-radius:1rem;
+      max-width:800px;
+      width:100%;
+      padding:1rem;
+      margin-top:2rem;
+      box-sizing:border-box;
+    }
+    #modal img{
+      width:100%;
+      height:auto;
+      max-height:400px;
+      object-fit:contain;
+      border-radius:0.5rem;
+    }
+    .provider-row{
+      display:flex;
+      flex-wrap:nowrap;
+      overflow-x:auto;
+      gap:0.3rem;
+      margin:0.5rem 0;
+    }
+    .provider-btn{
+      flex:0 0 auto;
+      padding:0.3rem 0.6rem;
+      font-size:clamp(10px,1.5vw,14px);
+      border-radius:0.3rem;
+      background:var(--btn-bg);
+      color:var(--text);
+      cursor:pointer;
+    }
+    .provider-btn:hover{
+      background:var(--btn-hover);
+    }
+
+    select{
+      padding:0.3rem;
+      border-radius:0.3rem;
+      margin-right:0.5rem;
+      background:var(--btn-bg);
+      color:var(--text);
+      font-size:clamp(10px,1.5vw,14px);
+    }
+
+    iframe{
+      width:100%;
+      max-height:500px;
+      border:0;
+      border-radius:0.5rem;
+    }
+
+    @media(max-width:600px){
+      #modal{
+        margin-top:1rem;
+        padding:0.5rem;
+      }
+      .provider-btn{
+        font-size:12px;
+        padding:0.2rem 0.4rem;
+      }
+      select{
+        font-size:12px;
+      }
+      iframe{
+        max-height:300px;
+      }
+    }
+
   </style>
 </head>
 <body>
-  <header>
-    <div class="brand">
-      <div class="logo">MH</div>
-      <div>
-        <h1>Media Hub</h1>
-        <div class="small-muted" style="font-size:12px">Movies · TV · Music — beautiful browser</div>
-      </div>
-    </div>
 
-    <div class="top-tabs" role="navigation" aria-label="Main tabs">
-      <button class="tab-btn" id="homeTab">Home</button>
-      <button class="tab-btn active" id="moviesTab">Movies</button>
-      <button class="tab-btn" id="tvTab">TV</button>
-      <button class="tab-btn" id="musicTab">Music</button>
-    </div>
-  </header>
+  <!-- Tabs -->
+  <nav>
+    <button id="homeTab" class="tab">Home</button>
+    <button id="moviesTab" class="tab active">Movies</button>
+    <button id="tvTab" class="tab">TV</button>
+    <button id="musicTab" class="tab">Music</button>
+  </nav>
 
-  <main id="main">
-    <!-- HOME -->
-    <section id="homeSection" class="home">
-      <div class="hero">
-        <div class="hero-card">
-          <h2 class="hero-title" id="heroTitle">Welcome to Media Hub</h2>
-          <p class="hero-desc" id="heroDesc">Browse trending movies and TV shows, search fast, and open music in a full screen player. Click any tab in the top-right to get started — or explore the featured picks below.</p>
-          <div class="hero-actions">
-            <button class="cta primary" id="ctaMovies">Browse Movies</button>
-            <button class="cta ghost" id="ctaTV">Browse TV</button>
-            <button class="cta ghost" id="ctaMusic">Play Music</button>
-          </div>
-          <div class="small-muted" style="margin-top:14px">Pro tip: click a poster to view details & safe embed options.</div>
-        </div>
+  <!-- Sections -->
+  <section id="homeSection">Home content here</section>
+  <section id="mediaSection">
+    <div id="media-grid"></div>
+    <button id="loadMoreBtn">Load More</button>
+  </section>
 
-        <aside class="side-card">
-          <h4 style="margin:0 0 8px 0">Quick Picks</h4>
-          <div class="small-muted">Trending today — quick open</div>
-          <div id="quickRow" class="row" style="margin-top:10px"></div>
-        </aside>
-      </div>
+  <section id="musicWrapper" style="display:none">
+    <iframe id="musicIframe"></iframe>
+    <button id="musicClose">Close Music</button>
+  </section>
 
-      <div class="section">
-        <h2>Trending Movies</h2>
-        <div id="trendingMovies" class="row"></div>
-      </div>
-
-      <div class="section">
-        <h2>Trending TV</h2>
-        <div id="trendingTV" class="row"></div>
-      </div>
-    </section>
-
-    <!-- MEDIA (Movies / TV browse) -->
-    <section id="mediaSection" style="display:block;">
-      <div class="media-toolbar">
-        <div class="search" title="Search">
-          <svg style="opacity:0.6" width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79L20 21.49 21.49 20l-5.99-6zM4 9.5A5.5 5.5 0 1 1 9.5 15 5.5 5.5 0 0 1 4 9.5z"/></svg>
-          <input id="searchInput" placeholder="Search movies or TV (press Enter)" />
-          <button id="clearSearch" title="Clear" style="background:transparent;border:0;color:var(--muted);cursor:pointer">✖</button>
-        </div>
-
-        <div class="chip-row" id="categoryChips"></div>
-
-        <div style="margin-left:auto; display:flex; gap:8px; align-items:center">
-          <button class="btn" id="openPrime">Prime Catalog</button>
-          <button class="btn" id="open345">345Movies</button>
-        </div>
-      </div>
-
-      <div id="gridWrap" class="grid"></div>
-      <div class="load-more"><button id="loadMore" class="btn">Load more</button></div>
-    </section>
-  </main>
-
-  <!-- providers/details modal -->
+  <!-- Modal Overlay -->
   <div id="overlay" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true">
-      <button class="close-x" id="closeModal">✖</button>
-      <div class="modal-left">
-        <img id="modalPoster" alt="">
-        <div class="small-muted" id="modalMeta"></div>
-        <div style="display:flex; gap:8px; margin-top:8px;">
-          <button class="btn" id="openTrailer">Watch Trailer</button>
-          <button class="btn" id="openInTab">Open Best Provider (new tab)</button>
-        </div>
+    <div id="modal">
+      <h2 id="modalTitle"></h2>
+      <p id="modalTagline"></p>
+      <img id="modalPoster" />
+      <p id="modalMeta"></p>
+      <p id="modalOverview"></p>
+
+      <div id="tvControls" style="display:none">
+        <select id="seasonSelect"></select>
+        <select id="episodeSelect"></select>
       </div>
 
-      <div class="modal-right">
-        <h3 id="modalTitle">Title</h3>
-        <div class="small-muted" id="modalTagline"></div>
-        <p id="modalOverview" style="line-height:1.5"></p>
+      <div class="provider-row" id="providersRow"></div>
+      <button id="openInTab">Open in Tab</button>
 
-        <!-- TV controls (hidden for movies) -->
-        <div id="tvControls" style="display:none; gap:10px; align-items:center; margin-top:6px;">
-          <label class="small-muted" for="seasonSelect">Season</label>
-          <select id="seasonSelect"></select>
-          <label class="small-muted" for="episodeSelect">Episode</label>
-          <select id="episodeSelect"></select>
-        </div>
-
-        <div>
-          <div class="small-muted">Watch Options</div>
-          <div class="providers" id="providersRow"></div>
-        </div>
-
-        <div class="small-muted" style="margin-top:6px">Note: some providers block embedding. If an embed fails, use "Open in new tab".</div>
-
-        <div id="embedContainer" class="provider-embed" style="margin-top:12px"></div>
-      </div>
+      <div id="embedContainer" style="margin-top:0.5rem;"></div>
+      <button id="closeModal">Close</button>
     </div>
   </div>
 
-  <!-- music full-screen wrapper -->
-  <div id="musicWrapper">
-    <button class="music-close" id="musicClose">✖</button>
-    <iframe id="musicIframe" src="" frameborder="0" allow="autoplay; encrypted-media; fullscreen" referrerpolicy="no-referrer"></iframe>
-  </div>
-
+  <!-- Scripts -->
   <script>
-    // ============== CONFIG ==============
-    const API_KEY = "a63b70ca6288b339b0b556535449d1b9"; // change if you want
-    const IMAGE_BASE = "https://image.tmdb.org/t/p/w500";
-    const SMALL_IMAGE_BASE = "https://image.tmdb.org/t/p/w300";
-    const TMDB_BASE = "https://api.themoviedb.org/3";
-
-    // Hosts we mark as trusted and will add allow-same-origin when embedding (music host included)
-    const TRUSTED_SAME_ORIGIN = new Set([
-      "wildcard.vapor.my.cdn.cloudflare.net",
-      "xprime.tv",
-      "player.vidplus.to",
-      "vidsrc.cc",
-      "vidsrc.to",
-      "multiembed.mov",
-      "2embed.org",
-      "vidnest.net",
-      "fmovies2.cx",
-      "spencerdevs.xyz",
-      "nhdapi.com",
-      "vidora.su"
-    ]);
-
+    const IS_MOBILE = /Mobi|Android/i.test(navigator.userAgent);
+    const TRUSTED_SAME_ORIGIN = new Set(["demo.vidplus.to","vidsrc.cc","vidnest.fun","fmovies.gd","xprime.tv","345movie.net","spencerdevs.xyz","nhdapi.com","flixer.su","watch.vidora.su"]);
     // DOM
     const homeTab = document.getElementById("homeTab");
     const moviesTab = document.getElementById("moviesTab");
